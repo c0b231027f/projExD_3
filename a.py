@@ -7,7 +7,6 @@ import pygame as pg
 
 WIDTH = 1100  # ゲームウィンドウの幅
 HEIGHT = 650  # ゲームウィンドウの高さ
-NUM_OF_BOMBS = 5
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -85,27 +84,26 @@ class Bird:
         screen.blit(self.img, self.rct)
 
 
-class Beam:# ビームクラス:
-    beams = []
-    # """
-    # こうかとんが放つビームに関するクラス
-    # """
+class Beam:
+    """
+    こうかとんが放つビームに関するクラス
+    """
     def __init__(self, bird:"Bird"):
-    #     """
-    #     ビーム画像Surfaceを生成する
-    #     引数 bird：ビームを放つこうかとん（Birdインスタンス）
-    #     """
+        """
+        ビーム画像Surfaceを生成する
+        引数 bird：ビームを放つこうかとん（Birdインスタンス）
+        """
         self.img = pg.image.load(f"fig/beam.png")
-        self.rct = self.img.get_rect()  #Rectの取得()
-        self.rct.centery = bird.rct.centery #こうかとんの中心縦座標
-        self.rct.left =bird.rct.right #こうかとんの右座標
+        self.rct = self.img.get_rect()
+        self.rct.centery = bird.rct.centery  # こうかとんの中心縦座標をビームの中心縦座標に設定
+        self.rct.left = bird.rct.right  # こうかとん右座標をビーム左座標に設定
         self.vx, self.vy = +5, 0
 
     def update(self, screen: pg.Surface):
-    #     """
-    #     ビームを速度ベクトルself.vx, self.vyに基づき移動させる
-    #     引数 screen：画面Surface
-    #     """
+        """
+        ビームを速度ベクトルself.vx, self.vyに基づき移動させる
+        引数 screen：画面Surface
+        """
         if check_bound(self.rct) == (True, True):
             self.rct.move_ip(self.vx, self.vy)
             screen.blit(self.img, self.rct)    
@@ -148,8 +146,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     beam = None
-    #bomb = Bomb((255,0,0),10)
-    bombs = [Bomb((250,0,0),10) for a in range(NUM_OF_BOMBS)]
+    bomb = Bomb((255, 0, 0), 10)
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -157,38 +154,29 @@ def main():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-            #     # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                # スペースキー押下でBeamクラスのインスタンス生成
+                beam = Beam(bird)
         screen.blit(bg_img, [0, 0])
-
-        for bomb in bombs:
+        
+        if bomb is not None:
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
-                fonto = pg.font.Font(None,80)
-                txt = fonto.render("Game Over", True, (255,0,0))
-                screen.blit(txt,[WIDTH/2-150,HEIGHT/2])
                 bird.change_img(8, screen)
                 pg.display.update()
                 time.sleep(1)
                 return
-        
-        for i in range(len(bombs)):
-            if beam is not None:
-                if bombs[i].rct.colliderect(beam.rct):
-                    bombs[i] = None
-                    beam = None
-                    bird.change_img(6,screen)
-        bombs = [bomb for bomb in bombs if bomb is not None]
 
-        for r in range(Beams):
-            
-            
+        if bomb is not None:
+            if beam is not None:
+                if bomb.rct.colliderect(beam.rct):
+                    bomb = None
+                    beam = None
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         if beam is not None:
             beam.update(screen)
-        for bomb in bombs: 
+        if bomb is not None:
             bomb.update(screen)
         pg.display.update()
         tmr += 1
