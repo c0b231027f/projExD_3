@@ -86,7 +86,6 @@ class Bird:
 
 
 class Beam:# ビームクラス:
-    beams = []
     # """
     # こうかとんが放つビームに関するクラス
     # """
@@ -152,6 +151,7 @@ def main():
     bombs = [Bomb((250,0,0),10) for a in range(NUM_OF_BOMBS)]
     clock = pg.time.Clock()
     tmr = 0
+    beams = []
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -180,7 +180,20 @@ def main():
                     bird.change_img(6,screen)
         bombs = [bomb for bomb in bombs if bomb is not None]
 
-        for r in range(Beams):
+        if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+            beams.append(1)
+            screen.blit(bg_img,[3,0])
+        if beams >= [1] :
+            if bomb is not None:
+                if beams[beams].rct.colliderect(beam.rct):
+                   beams = None
+                   bombs[i] = None
+        if beam is not None:
+            bomb.update(screen)
+        #if Beam() >= WIDTH:
+            #beams.remove(0)
+
+               
             
             
 
